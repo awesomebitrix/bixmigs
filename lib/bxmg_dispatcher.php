@@ -4,11 +4,17 @@
  * @author u_mulder <m264695502@gmail.com>
  */
 namespace Um;
+
+use \Bitrix\Main\Localization\Loc as Loc;
+Loc::loadMessages(__FILE__);
+
 class BixMigDispatcher
 {
 
-    const
-        TABLE_NAME = 'um_bixmigs_migrations';
+    protected
+        $migrations = array(),
+        $errors = array(),
+        $connectionPool = null;
 
     public function loadMigrations()
     {
@@ -17,20 +23,26 @@ class BixMigDispatcher
             'headers' => array(
                 array(
                     'id' => 'id',
-                    'content' => 'Migration',
+                    'content' => Loc::getMessage('MIGRATION_ID'),
                     'sort' => 'id',
                     'align' => 'left',
                     'default' => true,
                 ),
                 array(
                     'id' => 'status',
-                    'content' => 'Status',
+                    'content' => Loc::getMessage('MIGRATION_STATUS'),
                     'align' => 'right',
                     'default' => true,
                 ),
                 array(
-                    'id' => 'date',
-                    'content' => 'Date applied',
+                    'id' => 'date_c',
+                    'content' => Loc::getMessage('MIGRATION_DATE_CHANGED'),
+                    'align' => 'right',
+                    'default' => true,
+                ),
+                array(
+                    'id' => 'date_a',
+                    'content' => Loc::getMessage('MIGRATION_DATE_ADDED'),
                     'align' => 'right',
                     'default' => true,
                 ),
@@ -38,34 +50,34 @@ class BixMigDispatcher
         );
 
         $db_mgrs = $this->loadDBMigrations();
-        $di = new \DirectoryIterator(\UM_MODULE_MGR_FULL_PATH);
+        //var_dump($db_mgrs); // TODO
+
+        $di = new \DirectoryIterator(\UM_BM_MGR_FULL_PATH);
         while ($di->valid()) {
             if (!$di->isDot() && $this->hasProperFilename($di->getFilename())) {
                 $filename = $di->getFilename();
                 if (!array_key_exists($filename, $db_mgrs)) {
-                    $result['mgrs'][] = array(
-                        'id' => 201,
-                        'm' => $filename,
-                        's' => 'N',
-                        'd' => null,
-                    );
+                    /* migration should be added to db */
+                    $mgr = new BixMigBase();
+                    $mgr->setCode($filename)
+                        ->setStatus('UNKNOWN')
+                        ->setAddDate(date('d.m.Y H:i:s'))
+                        ->setChangeDate(date('d.m.Y H:i:s'))
+                        ->add();
+
+                    $result['mgrs'][] = $mgr;
                 } else {
-                    // skip or what?
-                    // unset $db_mgrs
-                    /*$result[] = array(
-                        'm' => ,
-                        's' => ,
-                        'd' => null,
-                    );*/
+                    $result['mgrs'][] = $db_mgrs[$filename];
+                    unset($db_mgrs[$filename]);
                 }
             }
 
             $di->next();
         }
 
-        if (!empty($db_mgrs)) {
-            //self::deleteOrphans(array_keys($db_mgrs));
-        }
+        /*if (!empty($db_mgrs)) {
+            $this->deleteOrphans($db_mgrs);
+        }*/
 
         return $result;
     }
@@ -81,28 +93,40 @@ class BixMigDispatcher
     public function loadDBMigrations()
     {
         $result = array();
+        $db_items = BixMigTable::getList();
 
-        $q = 'SELECT * FROM `' . self::TABLE_NAME . '` ORDER BY `id` DESC';
-        $db_items = $this->connectionPool->query($q);
         while ($row = $db_items->fetch()) {
-            echo'<pre>$row ',print_r($row),'</pre>';    // TODO
+            $mgr = new BixMigBase();
+            $mgr->setId($row['ID'])
+                ->setCode($row['CODE'])
+                ->setStatus($row['STATUS'])
+                ->setAddDate($row['CHANGE_DATE'])
+                ->setChangeDate($row['ADD_DATE']);
+            $result[$row['CODE']] = $mgr;
         }
 
         return $result;
     }
 
 
-    public static function deleteOrphans($ids)
+    public function deleteOrphans($mgrs)
     {
-        /*$q = 'DELETE FROM `' . self::TABLE_NAME . '` WHERE ? IN ()';
-        $r = ->execute($q);*/
+        $ids = array_reduce(
+            $mgrs,
+            function($t, $v) {
+                $t[] = $v->getId();
+
+                return $t;
+            },
+            array()
+        );
+
+        if (sizeof($ids)) {
+            $q = 'DELETE FROM `' . UM_BM_TABLE_NAME
+                . '` WHERE `id` IN (' . implode(', ', $ids) . ')';
+            $r = $this->connectionPool->execute($q);
+        }
     }
-
-
-    protected
-        $migrations = array(),
-        $errors = array(),
-        $connectionPool = null;
 
 
     public function __construct(BixMigAbstract $mgr = null)
@@ -111,6 +135,7 @@ class BixMigDispatcher
             $this->migrations[] = $mgr;
         }
 
+        /* Not flexible, no support for previous $DB */
         $this->connectionPool = \Bitrix\Main\Application::getConnection();
     }
 
