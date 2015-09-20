@@ -7,7 +7,6 @@ abstract class BixMigAbstract {
 
    protected
         $add_date,
-        $dbh,
         $change_date,
         $code,
         $id,
@@ -124,8 +123,6 @@ abstract class BixMigAbstract {
             // TODO - dunno what to do
             //foreach ($res->getErrors() as $error) {}
         }
-
-        var_dump($res);
     }
 
 
