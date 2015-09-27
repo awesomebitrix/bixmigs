@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS `um_bixmigs_migrations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(128) NOT NULL,
   `status` enum('UP','DOWN','UNKNOWN','') NOT NULL,
-  `date_added` datetime NOT NULL,
-  `date_changed` datetime NOT NULL,
+  `add_date` datetime NOT NULL,
+  `change_date` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=cp1251 AUTO_INCREMENT=1 ;
 

@@ -5,13 +5,18 @@
  */
 namespace Um;
 
-use \Bitrix\Main\Localization\Loc as Loc;
+use Bitrix\Main\Config\Option;
+use Bitrix\Main\Localization\Loc as Loc;
 Loc::loadMessages(__FILE__);
 
 class BixMigDispatcher
 {
 
+    const
+        DEFAULT_FILENAME_PATTERN = '/^Mgr_([0-9]{8})_([0-9]{6})_([a-z0-9_]+)\.php$/';
+
     protected
+        $filename_pattern = '',
         $migrations = array(),
         $errors = array();
 
@@ -49,7 +54,12 @@ class BixMigDispatcher
         );
 
         $db_mgrs = $this->loadDBMigrations();
-        $di = new \DirectoryIterator(\UM_BM_MGR_FULL_PATH);
+        $mgr_path = Option::get(
+            UM_BM_MODULE_NAME,
+            'migration_folder',
+            UM_BM_MGR_PATH
+        );
+        $di = new \DirectoryIterator($_SERVER['DOCUMENT_ROOT'] . $mgr_path);
         while ($di->valid()) {
             if (!$di->isDot() && $this->hasProperFilename($di->getFilename())) {
                 $filename = $di->getFilename();
@@ -81,8 +91,15 @@ class BixMigDispatcher
 
     protected function hasProperFilename($filename)
     {
-        // TODO pattern can be set as an option
-        return preg_match('/^Mgr_([0-9]{8})_([0-9]{6})_([a-z0-9_]+)\.php$/', $filename);
+        if (!$this->filename_pattern) {
+            $this->filename_pattern = Option::get(
+                UM_BM_MODULE_NAME,
+                'migration_filename_regexp',
+                self::DEFAULT_FILENAME_PATTERN
+            );
+        }
+
+        return preg_match($this->filename_pattern, $filename);
     }
 
 
