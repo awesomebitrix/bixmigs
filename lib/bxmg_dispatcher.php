@@ -191,14 +191,23 @@ class BixMigDispatcher
     public function executeMigrations($up = true)
     {
         foreach ($this->migrations as $mgr) {
-            if ($up) {
-                $r = $mgr->executeUp();
-            } else {
-                $r = $mgr->executeDown();
+            try {
+                if ($up) {
+                    $r = $mgr->executeUp();
+                } else {
+                    $r = $mgr->executeDown();
+                }
+            } catch(\Exception $e) {
+                $this->addError($e->getMessage());
             }
 
             if (!$r) {
-                // как-то распознать ошибки!
+                $this->addError(
+                    Loc::GetMessage(
+                        'MIGRATION_EXEC_FAIL',
+                        array('#MIG#' => $mgr->getCode()
+                    )
+                );
             } else {
                 $mgr->setChangeDate(date('d.m.Y H:i:s'))
                     ->setStatus($up? 'UP' : 'DOWN')
@@ -206,8 +215,7 @@ class BixMigDispatcher
             }
         }
 
-        //return $this->getErrors();
-        return true;
+        return $this->getErrors();
     }
 
 
@@ -226,5 +234,11 @@ class BixMigDispatcher
     public function getErrors()
     {
         return $this->errors;
+    }
+
+
+    public function addError($err)
+    {
+        $this->errors[] = $err;
     }
 }

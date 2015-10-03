@@ -8,3 +8,4 @@ $MESS['UM_BM_MIG_UP'] = 'Применить миграцию';
 $MESS['UM_BM_MIG_DOWN'] = 'Отменить миграцию';
 $MESS['UM_BM_MIG_UP_SUCC'] = 'Миграция успешно применена';
 $MESS['UM_BM_MIG_DOWN_SUCC'] = 'Миграция успешно отменена';
+$MESS['UM_BM_MIG_FAIL'] = 'Ошибки применения миграций<br />: #ERRORS#';

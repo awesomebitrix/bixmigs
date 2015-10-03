@@ -20,7 +20,7 @@ if (0 < $id) {
     if (is_object($mgr)) {
         $mgr_dsp->addMigration($mgr);
         $r = $mgr_dsp->executeMigrations($do != 'down');
-        if ($r) {
+        if (!$r) {
             $_SESSION[$succ_session_key]
                 = Bitrix\Main\Localization\Loc::getMessage(
                     $do != 'down'? 'UM_BM_MIG_UP_SUCC' : 'UM_BM_MIG_DOWN_SUCC'
@@ -83,9 +83,14 @@ if (isset($_SESSION[$succ_session_key])) {
     unset($_SESSION[$succ_session_key]);
 }
 
-// errors here
 if (isset($_SESSION[$fail_session_key])) {
-    //CAdminMessage::ShowMessage(Bitrix\Main\Localization\Loc::getMessage('UM_BM_MIG_UP_SUCC')); - show error o_O
+    CAdminMessage::ShowMessage(
+        Bitrix\Main\Localization\Loc::getMessage(
+            'UM_BM_MIG_FAIL'
+            array('#ERRORS#' => implode('<br />', $_SESSION[$fail_session_key]))
+        )
+    );
+    unset($_SESSION[$fail_session_key]);
 }
 
 $lAdmin->DisplayList();
