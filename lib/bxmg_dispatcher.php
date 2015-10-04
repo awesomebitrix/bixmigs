@@ -68,7 +68,7 @@ class BixMigDispatcher
                     $mgr->setCode($filename)
                         ->setStatus('UNKNOWN')
                         ->setAddDate(date('d.m.Y H:i:s'))
-                        ->setChangeDate(date('d.m.Y H:i:s'))
+                        ->setChangeDate()
                         ->add();
 
                     $result['mgrs'][] = $mgr;
@@ -205,7 +205,7 @@ class BixMigDispatcher
                 $this->addError(
                     Loc::GetMessage(
                         'MIGRATION_EXEC_FAIL',
-                        array('#MIG#' => $mgr->getCode()
+                        array('#MIG#' => $mgr->getCode())
                     )
                 );
             } else {

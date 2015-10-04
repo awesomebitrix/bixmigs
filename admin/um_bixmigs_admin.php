@@ -1,7 +1,4 @@
 <?php
-
-error_reporting(E_ALL); // TODO
-
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
 Bitrix\Main\Localization\Loc::loadMessages(__FILE__);
 $APPLICATION->SetTitle(Bitrix\Main\Localization\Loc::getMessage('UM_BM_LIST_TITLE'));
@@ -86,7 +83,7 @@ if (isset($_SESSION[$succ_session_key])) {
 if (isset($_SESSION[$fail_session_key])) {
     CAdminMessage::ShowMessage(
         Bitrix\Main\Localization\Loc::getMessage(
-            'UM_BM_MIG_FAIL'
+            'UM_BM_MIG_FAIL',
             array('#ERRORS#' => implode('<br />', $_SESSION[$fail_session_key]))
         )
     );

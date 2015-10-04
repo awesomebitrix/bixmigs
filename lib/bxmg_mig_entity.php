@@ -23,7 +23,10 @@ class BixMigTable extends Entity\DataManager {
             ),
             new Entity\StringField('CODE'),
             new Entity\StringField('STATUS'),
-            new Entity\DateTimeField('CHANGE_DATE'),
+            new Entity\DateTimeField(
+                'CHANGE_DATE',
+                array('default_value' => null)
+            ),
             new Entity\DateTimeField('ADD_DATE'),
         );
     }
