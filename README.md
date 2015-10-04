@@ -34,14 +34,14 @@ With action menu for each record you can apply migration up or down.
 
 ## Migration-files
 
-Migration files should be stored in a folder, defined by a module setting.
+Migration files should be stored in a folder defined by a module setting.
 
-Every migration file should extend `Um\BixMigAbstract` class and two methods should be defined:
+Every migration file should store **one** class which extends `Um\BixMigAbstract` class and defines two methods:
 
- - `executeUp` - adding some data via migration
- - `executeDown` - remove previously added with `executeUp` data
+ - `executeUp` - adds some data via migration, takes no arguments
+ - `executeDown` - removes previously added with `executeUp` data, takes no arguments
 
-File name should be the same as class name with php extension.
+File name should be the same as class name with `.php` extension.
 So, if your migration class is `My_super_migration_2211`, file name should be `My_super_migration_2211.php`
 
 ## Errors handling
