@@ -8,12 +8,17 @@ Not tested for Oracle, MSSQL.
 
 ## Contents
 
-[Installation]()
-[Migration basics]()
-[Migration files]()
-[Errors handling]()
+[Installation](#installation)
 
-(## Installation)
+[Migration basics](#migration-basics)
+
+[Migration files](#migration-files)
+
+[Errors handling](#errors-handling)
+
+
+(#installation)
+## Installation
 
 By default module should be placed in `/local/modules/`. Folder name module should be `um.bixmigs`.
 
@@ -23,12 +28,15 @@ After installation, module admin page is available in `Services` section.
 
 Module also has a couple of settings.
 
-(##Migration-basics)
+(#migration-basics)
+## Migration basics
 
 On module admin page you can see list of existing migration files.
-With action menu for each record you can apply migration up or down
 
-(## Migration-files)
+With action menu for each record you can apply migration up or down.
+
+(#migration-files)
+## Migration-files
 
 Migration files should be stored in a folder, defined by a module setting.
 
@@ -40,7 +48,8 @@ Every migration file should extend `Um\BixMigAbstract` class and two methods sho
 File name should be the same as class name with php extension.
 So, if your migration class is `My_super_migration_2211`, file name should be `My_super_migration_2211.php`
 
-(##Errors handling)
+(#errors-handling)
+## Errors handling
 
 By default `executeUp` and `executeDown` function should return `true` in case of success.
 
